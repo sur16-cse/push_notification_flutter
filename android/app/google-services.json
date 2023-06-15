@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "796245141825",
+    "project_id": "fir-push-notification-24fb4",
+    "storage_bucket": "fir-push-notification-24fb4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:796245141825:android:595a33a9120ce1ff7299c0",
+        "android_client_info": {
+          "package_name": "com.surbhi.push_notification"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "796245141825-6euk6rpvuth8uge3rq3gpu20jq606t5u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC5y8BRN64ILHj54080LniSQzU7hTKMcTg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "796245141825-6euk6rpvuth8uge3rq3gpu20jq606t5u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
