@@ -46,9 +46,9 @@ class _HomeScreenState extends State<HomeScreen> {
               },
               // 'data':
             };
-            await http.post(Uri.parse(''),body: jsonEncode(data),headers: {
+            await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),body: jsonEncode(data),headers: {
               'Content-Type':'application/json,charset=UTF-8',
-              'Authorization':'AAAAuWPoqUE:APA91bFysWspzQHc67yU-G0AR3ehcdef8iaBxQK0gA8hPiBvSAcEqD2GDHjP5HXVwuCJ4CWMHMjRsRzdYbH_X8FId8rntHr3xwBdqFkUkisO5L-bDNrAivJKOyro6Z_7BduIb63MZrYl'
+              'Authorization':'key=AAAAuWPoqUE:APA91bFysWspzQHc67yU-G0AR3ehcdef8iaBxQK0gA8hPiBvSAcEqD2GDHjP5HXVwuCJ4CWMHMjRsRzdYbH_X8FId8rntHr3xwBdqFkUkisO5L-bDNrAivJKOyro6Z_7BduIb63MZrYl'
             });
           });
         }, child: Text('Send Notification'),),
