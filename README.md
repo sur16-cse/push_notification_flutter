@@ -76,7 +76,7 @@ seeting android manifest for icon
 android:resource="@drawable/ic_stat_notifications_active" />
 ```
 
-## Functionality packages provide:
+## Functionality package provide:
 - request permission
 - getDeviceToken
 - tokenRefesh if expire
