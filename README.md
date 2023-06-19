@@ -7,9 +7,9 @@ A new Flutter project.
 
 - set up and change (optional) package name : The package name will be available in the ./android/app/build.gradle file of your Flutter project.
 
--After register:  google-services.json file which will link our Flutter app to Firebase Google services. We need to download the file and move it to the ./android/app directory of our Flutter project.
+- After register:  google-services.json file which will link our Flutter app to Firebase Google services. We need to download the file and move it to the ./android/app directory of our Flutter project.
 
--Add Firebase Configurations to Native Files in your Flutter Project: root-level (project-level) Gradle file (android/build.gradle), we need to add rules to include the Google Services Gradle plugin.
+- Add Firebase Configurations to Native Files in your Flutter Project: root-level (project-level) Gradle file (android/build.gradle), we need to add rules to include the Google Services Gradle plugin.
 ```
 buildscript {
     repositories {
@@ -32,9 +32,10 @@ buildscript {
 }
 ```
 - (app-level) Gradle file (android/app/build.gradle), we need to apply the Google Services Gradle plugin.
-
-- // Add the following line:
+```
+// Add the following line:
   **apply plugin: 'com.google.gms.google-services'**  // Google Services plugin
+```
 
 - Integrate Firebase Messaging with Flutter: add the firebase-messaging dependency to the ./android/app/build.gardle file.
 ```
