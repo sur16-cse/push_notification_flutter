@@ -1,17 +1,16 @@
 import 'dart:async';
 import 'dart:math';
-
-import 'package:app_settings/app_settings.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:push_notification/message_screen.dart';
+
+import '../message_screen.dart';
+
 
 class NotificationServices {
-  FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+ final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -53,14 +52,13 @@ class NotificationServices {
     AndroidNotificationChannel channel = AndroidNotificationChannel(
       Random.secure().nextInt(1000).toString(),
       'High Importance Notification',
-      description:
-      'This channel is used for important notifications.',
+      description: 'This channel is used for important notifications.',
       importance: Importance.high,
     );
 
     await _flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>()
+            AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
 
     AndroidNotificationDetails androidNotificationDetails =
@@ -97,21 +95,28 @@ class NotificationServices {
 
   Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     await Firebase.initializeApp();
-  await  showNotification(message);
-    print("background");
-    print(message.notification?.title.toString());
+    await showNotification(message);
+    if (kDebugMode) {
+      print("background");
+      print(message.notification?.title.toString());
+    }
+
   }
 
-  Future<String?> isTokenRefresh() async {
+  void isTokenRefresh() {
     _firebaseMessaging.onTokenRefresh.listen((event) {
       event.toString();
-      print("refresh");
+      if (kDebugMode) {
+        print("refresh");
+      }
     });
   }
 
   Future<String?> getDeviceToken() async {
     String? token = await _firebaseMessaging.getToken();
-    print('FCM Token: $token');
+    if (kDebugMode) {
+      print('FCM Token: $token');
+    }
     return token;
   }
 
@@ -127,20 +132,27 @@ class NotificationServices {
     );
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      print('User granted permission');
+      if (kDebugMode) {
+        print('User granted permission');
+      }
     } else if (settings.authorizationStatus ==
         AuthorizationStatus.provisional) {
-      print('User granted provisional permission');
+      if (kDebugMode) {
+        print('User granted provisional permission');
+      }
     } else {
       // AppSettings.openNotificationSettings();
-      print('User declined or has not accepted permission');
+      if (kDebugMode) {
+        print('User declined or has not accepted permission');
+      }
     }
   }
 
-  Future<void>setupInteractMessage(BuildContext context) async{
+  Future<void> setupInteractMessage(BuildContext context) async {
     //when app is terminated
-    RemoteMessage? initialMessage=await FirebaseMessaging.instance.getInitialMessage();
-    if(initialMessage!=null){
+    RemoteMessage? initialMessage =
+        await FirebaseMessaging.instance.getInitialMessage();
+    if (initialMessage != null && context.mounted) {
       handleMessage(context, initialMessage);
     }
 
@@ -153,19 +165,25 @@ class NotificationServices {
   void handleMessage(BuildContext context, RemoteMessage message) {
     if (message.data["type"] == 'msj') {
       Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => MessageScreen(id: message.data['id']),));
+        context,
+        MaterialPageRoute(
+          builder: (context) => MessageScreen(id: message.data['id']),
+        ),
+      );
     }
   }
 
   Future<void> subscribeToTopic(String topic) async {
     await _firebaseMessaging.subscribeToTopic(topic);
-    print('Subscribed to topic: $topic');
+    if (kDebugMode) {
+      print('Subscribed to topic: $topic');
+    }
   }
 
   Future<void> unsubscribeFromTopic(String topic) async {
     await _firebaseMessaging.unsubscribeFromTopic(topic);
-    print('Unsubscribed from topic: $topic');
+    if (kDebugMode) {
+      print('Unsubscribed from topic: $topic');
+    }
   }
 }

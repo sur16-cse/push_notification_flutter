@@ -12,7 +12,7 @@ class _MessageScreenState extends State<MessageScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Message Screen"+widget.id),),
+      appBar: AppBar(title: Text("Message Screen${widget.id}"),),
     );
   }
 }
