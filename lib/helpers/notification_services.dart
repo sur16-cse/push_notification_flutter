@@ -8,9 +8,27 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../message_screen.dart';
 
+Future<void> firebaseMessagingBackgroundHandler(
+    RemoteMessage? message) async {
+  await Firebase.initializeApp();
+  NotificationServices notificationServices = NotificationServices();
+
+  if (message != null) {
+    await notificationServices.showNotification(message);
+    if (kDebugMode) {
+      print("background");
+      print(message.notification?.title.toString());
+    }
+  }
+}
+
+void ext(){
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+}
+
 
 class NotificationServices {
- final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -46,6 +64,10 @@ class NotificationServices {
       showNotification(message);
       // Handle the received message
     });
+  }
+
+  static void backgroundMessage() {
+   ext();
   }
 
   Future<void> showNotification(RemoteMessage message) async {
@@ -91,16 +113,6 @@ class NotificationServices {
           message.notification?.body.toString(),
           notificationDetails);
     });
-  }
-
-  Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-    await Firebase.initializeApp();
-    await showNotification(message);
-    if (kDebugMode) {
-      print("background");
-      print(message.notification?.title.toString());
-    }
-
   }
 
   void isTokenRefresh() {

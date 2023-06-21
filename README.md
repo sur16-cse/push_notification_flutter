@@ -84,8 +84,8 @@ android:resource="@drawable/ic_stat_notifications_active" />
 - background notification
 - Interact with notification after click switch to some page
 - subscribe notification related to particular topic
--unsubscribe from topic
--customising banner of push notification
+- unsubscribe from topic
+- customising banner of push notification
 
 
 ## Getting Started
