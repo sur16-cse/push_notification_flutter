@@ -69,12 +69,6 @@ android:value="high_importance_channel" />
 ```
 
 - for giving icon to push notification ./android/app/src/main/res inside that extract icon and put it in res folder and it is responsible for giving icon to push notification
-seeting android manifest for icon
-```
-// add this line according to your icon
-<meta-data android:name="com.google.firebase.messaging.default_notification_icon"
-android:resource="@drawable/ic_stat_notifications_active" />
-```
 
 ## Functionality package provide:
 - request permission

@@ -1,10 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-
 import 'helpers/notification_services.dart';
 import 'home_screen.dart';
-
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

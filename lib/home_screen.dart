@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:push_notification_firebase/message_screen.dart';
 
 import 'helpers/notification_services.dart';
 
@@ -21,6 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // TODO: implement initState
     super.initState();
     notificationServices.requestNotificationPermissions();
+    notificationServices.getData('ic_stat_notifications_active', "Test_push_notification", "Test push notification", "package push_notification_firebase");
     notificationServices.firebaseInit(context);
     notificationServices.setupInteractMessage(context);
     notificationServices.isTokenRefresh();
@@ -29,8 +31,8 @@ class _HomeScreenState extends State<HomeScreen> {
         print("device token");
         print(value);
       }
-
     });
+    notificationServices.sendRegistrationToken();
   }
 
   @override
@@ -40,22 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
           title: const Text("Flutter Notification"), backgroundColor: Colors.blue),
       body: Center(
         child: TextButton( onPressed: (){
-          notificationServices.getDeviceToken().then((value) async{
-            var data={
-              'to':value.toString(),
-              'priority':'high',
-              'notification':{
-                'title':'Surbhi',
-                'body':'Subscribe to my channel',
-
-              },
-              // 'data':
-            };
-            await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),body: jsonEncode(data),headers: {
-              'Content-Type':'application/json,charset=UTF-8',
-              'Authorization':'key=AAAAuWPoqUE:APA91bFysWspzQHc67yU-G0AR3ehcdef8iaBxQK0gA8hPiBvSAcEqD2GDHjP5HXVwuCJ4CWMHMjRsRzdYbH_X8FId8rntHr3xwBdqFkUkisO5L-bDNrAivJKOyro6Z_7BduIb63MZrYl'
-            });
-          });
+          notificationServices.sendPushNotification();
         }, child: const Text('Send Notification'),),
       ),
     );

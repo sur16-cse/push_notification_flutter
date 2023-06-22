@@ -5,9 +5,11 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:http/http.dart' as http;
 
 import '../message_screen.dart';
 
+//notification handle in background
 Future<void> firebaseMessagingBackgroundHandler(
     RemoteMessage? message) async {
   await Firebase.initializeApp();
@@ -22,22 +24,32 @@ Future<void> firebaseMessagingBackgroundHandler(
   }
 }
 
+//handling backgroundMessage call
 void ext(){
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 }
 
 
 class NotificationServices {
+  late String icon;
+  late String title;
+  late String message;
+  late String body;
+  late String deepLink;
+
+  //instantiating a firebase
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
+  //instantiate a local notification
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  FlutterLocalNotificationsPlugin();
 
-  Future<void> initLocalNotification(
-      BuildContext context, RemoteMessage message) async {
+  //initialising local notification
+  Future<void> initLocalNotification(BuildContext context,
+      RemoteMessage message) async {
     //helps to change the notification status icon
     var androidInitializationSettings = const AndroidInitializationSettings(
-      '@drawable/ic_stat_notifications_active',
+        '@mipmap/ic_launcher'
     );
     var iosInitializationSettings = const DarwinInitializationSettings();
 
@@ -46,16 +58,19 @@ class NotificationServices {
 
     await _flutterLocalNotificationsPlugin.initialize(initializationSetting,
         onDidReceiveNotificationResponse: (payload) {
-      // handle interaction when app is active for android
-      handleMessage(context, message);
-    });
+          // handle interaction when app is active for android
+          handleMessage(context, message);
+        });
   }
 
+//handle incoming message when app is in foreground
   void firebaseInit(BuildContext context) {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       if (kDebugMode) {
         print(
-            'Receive message title: ${message.notification?.title} \n Received message body: ${message.notification?.body}');
+            'Receive message title: ${message.notification
+                ?.title} \n Received message body: ${message.notification
+                ?.body}');
         print(message.data.toString());
         print(message.data["type"]);
         print(message.data["id"]);
@@ -66,8 +81,9 @@ class NotificationServices {
     });
   }
 
+  //handle incoming message when app is in background
   static void backgroundMessage() {
-   ext();
+    ext();
   }
 
   Future<void> showNotification(RemoteMessage message) async {
@@ -80,11 +96,11 @@ class NotificationServices {
 
     await _flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+        AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
 
     AndroidNotificationDetails androidNotificationDetails =
-        AndroidNotificationDetails(
+    AndroidNotificationDetails(
       channel.id.toString(),
       channel.name.toString(),
       icon: 'ic_stat_notifications_active',
@@ -92,10 +108,11 @@ class NotificationServices {
       importance: Importance.high,
       priority: Priority.high,
       ticker: "ticker",
+
     );
 
     const DarwinNotificationDetails darwinNotificationDetails =
-        DarwinNotificationDetails(
+    DarwinNotificationDetails(
       presentAlert: true,
       presentBadge: true,
       presentSound: true,
@@ -160,10 +177,11 @@ class NotificationServices {
     }
   }
 
+  //handle deep linking when app terminated or in background
   Future<void> setupInteractMessage(BuildContext context) async {
     //when app is terminated
     RemoteMessage? initialMessage =
-        await FirebaseMessaging.instance.getInitialMessage();
+    await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null && context.mounted) {
       handleMessage(context, initialMessage);
     }
@@ -185,6 +203,14 @@ class NotificationServices {
     }
   }
 
+  void getData(String? icon, String? title, String? message, String body) {
+    icon = icon;
+    title = title;
+    message = message;
+    body = body;
+  }
+
+
   Future<void> subscribeToTopic(String topic) async {
     await _firebaseMessaging.subscribeToTopic(topic);
     if (kDebugMode) {
@@ -197,5 +223,65 @@ class NotificationServices {
     if (kDebugMode) {
       print('Unsubscribed from topic: $topic');
     }
+  }
+
+  Future<void> sendRegistrationToken() async {
+    final url = Uri.parse('http://172.17.160.1:3000/register');
+    var token = await _firebaseMessaging.getToken();
+    var data = '''
+    {
+      "notification": {
+        "body": "this is a body",
+        "title": "this is a title"
+      },
+      "priority": "high",
+      "data": {
+        "click_action": "FLUTTER_NOTIFICATION_CLICK"
+      },
+      "token": "$token",
+      "topics": "test"
+    }
+  ''';
+
+    final response = await http.post(
+      url,
+      headers: <String, String>{
+        "Content-Type": "application/json",
+        "Keep-Alive": "timeout=5",
+        "Authorization": "$token"
+      },
+      body: data,
+    );
+    print(response.statusCode);
+  }
+
+  Future<void> sendPushNotification() async {
+    final url = Uri.parse('http://172.17.160.1:3000/push');
+    var token = await _firebaseMessaging.getToken();
+    var data = '''
+    {
+      "notification": {
+        "body": "this is a body",
+        "title": "this is a title"
+      },
+      "priority": "high",
+      "data": {
+        "click_action": "FLUTTER_NOTIFICATION_CLICK"
+      },
+      "token": "$token",
+      "topics": "test"
+    }
+  ''';
+
+    final response = await http.post(
+      url,
+      headers: <String, String>{
+        "Content-Type": "application/json",
+        "Keep-Alive": "timeout=5",
+        "Authorization": "$token"
+      },
+      body: data,
+    );
+    print(response.statusCode);
   }
 }
