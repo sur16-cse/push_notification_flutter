@@ -256,7 +256,7 @@ class NotificationServices {
   }
 
   Future<void> sendPushNotification() async {
-    final url = Uri.parse('http://172.17.160.1:3000/push');
+    final url = Uri.parse('http://localhost:3000/push');
     var token = await _firebaseMessaging.getToken();
     var data = '''
     {
