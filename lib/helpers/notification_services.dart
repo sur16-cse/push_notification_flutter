@@ -226,7 +226,7 @@ class NotificationServices {
   }
 
   Future<void> sendRegistrationToken() async {
-    final url = Uri.parse('http://49.249.28.158:3000/register');
+    final url = Uri.parse('http://172.16.1.51:3000/register');
     var token = await _firebaseMessaging.getToken();
     var data = '''
     {
