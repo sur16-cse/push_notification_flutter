@@ -257,7 +257,7 @@ class NotificationServices {
   }
 
   Future<void>updateStatus() async{
-    final url = Uri.parse('http://172.16.1.51:3000/register');
+    final url = Uri.parse('http://172.16.1.51:3000/update');
     var token = await _firebaseMessaging.getToken();
     final response = await http.post(
       url,
