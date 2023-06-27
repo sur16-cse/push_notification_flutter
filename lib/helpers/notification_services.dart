@@ -259,7 +259,7 @@ class NotificationServices {
   Future<void>updateStatus() async{
     final url = Uri.parse('http://172.16.1.51:3000/update');
     var token = await _firebaseMessaging.getToken();
-    final response = await http.post(
+    final response = await http.put(
       url,
       headers: <String, String>{
         "Content-Type": "application/json",
@@ -267,6 +267,9 @@ class NotificationServices {
         "Authorization": "$token"
       },
     );
+    print(response);
+    print(response.body);
+
   }
 
   Future<void> sendPushNotification() async {
