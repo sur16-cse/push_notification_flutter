@@ -98,7 +98,7 @@ class NotificationServices {
 
     }
 
-    final Color notificationColor=("Colors."+message.data['color']) as Color;
+    final Color notificationColor=Color(int.parse(message.data['color'].substring(1, 7), radix: 16) + 0xFF000000);
 
     AndroidNotificationChannel channel = AndroidNotificationChannel(
       Random.secure().nextInt(1000).toString(),
@@ -314,6 +314,8 @@ class NotificationServices {
       },
       body: data,
     );
-    print(response.statusCode);
+    if (kDebugMode) {
+      print(response.statusCode);
+    }
   }
 }
