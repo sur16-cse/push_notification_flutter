@@ -11,8 +11,7 @@ import 'package:push_notification_firebase/utils/download_file.dart';
 import '../message_screen.dart';
 
 //notification handle in background
-Future<void> firebaseMessagingBackgroundHandler(
-    RemoteMessage? message) async {
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage? message) async {
   await Firebase.initializeApp();
   NotificationServices notificationServices = NotificationServices();
 
@@ -26,10 +25,9 @@ Future<void> firebaseMessagingBackgroundHandler(
 }
 
 //handling backgroundMessage call
-void ext(){
+void ext() {
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 }
-
 
 class NotificationServices {
   late String icon;
@@ -43,15 +41,14 @@ class NotificationServices {
 
   //instantiate a local notification
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
-  FlutterLocalNotificationsPlugin();
+      FlutterLocalNotificationsPlugin();
 
   //initialising local notification
-  Future<void> initLocalNotification(BuildContext context,
-      RemoteMessage message) async {
+  Future<void> initLocalNotification(
+      BuildContext context, RemoteMessage message) async {
     //helps to change the notification status icon
-    var androidInitializationSettings = const AndroidInitializationSettings(
-        '@mipmap/ic_launcher'
-    );
+    var androidInitializationSettings =
+        const AndroidInitializationSettings('@mipmap/ic_launcher');
     var iosInitializationSettings = const DarwinInitializationSettings();
 
     var initializationSetting = InitializationSettings(
@@ -59,9 +56,9 @@ class NotificationServices {
 
     await _flutterLocalNotificationsPlugin.initialize(initializationSetting,
         onDidReceiveNotificationResponse: (payload) {
-          // handle interaction when app is active for android
-          handleMessage(context, message);
-        });
+      // handle interaction when app is active for android
+      handleMessage(context, message);
+    });
   }
 
 //handle incoming message when app is in foreground
@@ -69,9 +66,7 @@ class NotificationServices {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       if (kDebugMode) {
         print(
-            'Receive message title: ${message.notification
-                ?.title} \n Received message body: ${message.notification
-                ?.body}');
+            'Receive message title: ${message.notification?.title} \n Received message body: ${message.notification?.body}');
         print(message.data.toString());
         print(message.data["type"]);
         print(message.data["id"]);
@@ -89,14 +84,22 @@ class NotificationServices {
 
   Future<void> showNotification(RemoteMessage message) async {
     String? imageUrl = message.data['imageUrl'];
-final bigPicturePath= await DownloadFile.downloadFile(imageUrl!, 'imageNotification');
+    String? largeIcon=message.data['largeIcon'];
+    final bigPicturePath =
+        await DownloadFile.downloadFile(imageUrl!, 'imageNotification');
+    final largeIconPath=await DownloadFile.downloadFile(largeIcon!, 'largeIconNotification');
     // Create a style information object based on the image URL
     BigPictureStyleInformation? styleInformation;
-    if (imageUrl != null) {
-      styleInformation = BigPictureStyleInformation(FilePathAndroidBitmap(bigPicturePath));
+    if (imageUrl != null || largeIcon!=null) {
+      styleInformation =
+          BigPictureStyleInformation(FilePathAndroidBitmap(bigPicturePath),largeIcon: FilePathAndroidBitmap(largeIconPath));
     } else {
       styleInformation = null;
+
     }
+
+    final Color notificationColor=("Colors."+message.data['color']) as Color;
+
     AndroidNotificationChannel channel = AndroidNotificationChannel(
       Random.secure().nextInt(1000).toString(),
       'High Importance Notification',
@@ -106,12 +109,11 @@ final bigPicturePath= await DownloadFile.downloadFile(imageUrl!, 'imageNotificat
 
     await _flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>()
+            AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
 
-
     AndroidNotificationDetails androidNotificationDetails =
-    AndroidNotificationDetails(
+        AndroidNotificationDetails(
       channel.id.toString(),
       channel.name.toString(),
       icon: message.data['icon'] ?? '@mipmap/ic_launcher',
@@ -120,13 +122,12 @@ final bigPicturePath= await DownloadFile.downloadFile(imageUrl!, 'imageNotificat
       priority: Priority.high,
       ticker: "ticker",
       // sound: ,
-      // color: ,
-      // largeIcon:,
-      styleInformation:   styleInformation,
+      color:notificationColor, // largeIcon:,
+      styleInformation: styleInformation,
     );
 
     const DarwinNotificationDetails darwinNotificationDetails =
-    DarwinNotificationDetails(
+        DarwinNotificationDetails(
       presentAlert: true,
       presentBadge: true,
       presentSound: true,
@@ -139,10 +140,10 @@ final bigPicturePath= await DownloadFile.downloadFile(imageUrl!, 'imageNotificat
 
     Future.delayed(Duration.zero, () {
       _flutterLocalNotificationsPlugin.show(
-          0,
-          message.notification?.title.toString(),
-          message.notification?.body.toString(),
-          notificationDetails,
+        0,
+        message.notification?.title.toString(),
+        message.notification?.body.toString(),
+        notificationDetails,
         // payload:
       );
     });
@@ -197,7 +198,7 @@ final bigPicturePath= await DownloadFile.downloadFile(imageUrl!, 'imageNotificat
   Future<void> setupInteractMessage(BuildContext context) async {
     //when app is terminated
     RemoteMessage? initialMessage =
-    await FirebaseMessaging.instance.getInitialMessage();
+        await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null && context.mounted) {
       handleMessage(context, initialMessage);
     }
@@ -225,7 +226,6 @@ final bigPicturePath= await DownloadFile.downloadFile(imageUrl!, 'imageNotificat
     message = message;
     body = body;
   }
-
 
   Future<void> subscribeToTopic(String topic) async {
     await _firebaseMessaging.subscribeToTopic(topic);
@@ -272,7 +272,7 @@ final bigPicturePath= await DownloadFile.downloadFile(imageUrl!, 'imageNotificat
     print(response.body);
   }
 
-  Future<void>updateStatus() async{
+  Future<void> updateStatus() async {
     final url = Uri.parse('http://172.16.1.51:3000/update');
     var token = await _firebaseMessaging.getToken();
     final response = await http.put(
@@ -285,7 +285,6 @@ final bigPicturePath= await DownloadFile.downloadFile(imageUrl!, 'imageNotificat
     );
     print(response);
     print(response.body);
-
   }
 
   Future<void> sendPushNotification() async {
