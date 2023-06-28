@@ -87,6 +87,15 @@ class NotificationServices {
   }
 
   Future<void> showNotification(RemoteMessage message) async {
+    String? imageUrl = message.data['imageUrl'];
+
+    // Create a style information object based on the image URL
+    BigPictureStyleInformation? styleInformation;
+    if (imageUrl != null) {
+      styleInformation = BigPictureStyleInformation(FilePathAndroidBitmap(imageUrl));
+    } else {
+      styleInformation = null;
+    }
     AndroidNotificationChannel channel = AndroidNotificationChannel(
       Random.secure().nextInt(1000).toString(),
       'High Importance Notification',
@@ -99,16 +108,20 @@ class NotificationServices {
         AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
 
+
     AndroidNotificationDetails androidNotificationDetails =
     AndroidNotificationDetails(
       channel.id.toString(),
       channel.name.toString(),
-      icon: 'ic_stat_notifications_active',
+      icon: message.data['icon'] ?? '@mipmap/ic_launcher',
       channelDescription: "your channel description",
       importance: Importance.high,
       priority: Priority.high,
       ticker: "ticker",
-
+      // sound: ,
+      // color: ,
+      // largeIcon:,
+      styleInformation:   styleInformation,
     );
 
     const DarwinNotificationDetails darwinNotificationDetails =
@@ -128,7 +141,9 @@ class NotificationServices {
           0,
           message.notification?.title.toString(),
           message.notification?.body.toString(),
-          notificationDetails);
+          notificationDetails,
+        // payload:
+      );
     });
   }
 
