@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
+import 'package:push_notification_firebase/utils/download_file.dart';
 
 import '../message_screen.dart';
 
@@ -88,11 +89,11 @@ class NotificationServices {
 
   Future<void> showNotification(RemoteMessage message) async {
     String? imageUrl = message.data['imageUrl'];
-
+final bigPicturePath= await DownloadFile.downloadFile(imageUrl!, 'imageNotification');
     // Create a style information object based on the image URL
     BigPictureStyleInformation? styleInformation;
     if (imageUrl != null) {
-      styleInformation = BigPictureStyleInformation(FilePathAndroidBitmap(imageUrl));
+      styleInformation = BigPictureStyleInformation(FilePathAndroidBitmap(bigPicturePath));
     } else {
       styleInformation = null;
     }
