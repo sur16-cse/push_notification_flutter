@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
 import 'package:push_notification_firebase/utils/download_file.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../message_screen.dart';
 
@@ -42,7 +43,7 @@ class NotificationServices {
   //instantiate a local notification
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
-
+   final onNotifications=BehaviorSubject<String?>();
   //initialising local notification
   Future<void> initLocalNotification(
       BuildContext context, RemoteMessage message) async {
@@ -55,10 +56,12 @@ class NotificationServices {
         android: androidInitializationSettings, iOS: iosInitializationSettings);
 
     await _flutterLocalNotificationsPlugin.initialize(initializationSetting,
-        onDidReceiveNotificationResponse: (payload) {
+        onDidReceiveNotificationResponse: (payload) async{
       // handle interaction when app is active for android
       handleMessage(context, message);
-    });
+    },
+
+    );
   }
 
 //handle incoming message when app is in foreground
@@ -122,6 +125,7 @@ class NotificationServices {
       priority: Priority.high,
       ticker: "ticker",
       // sound: ,
+
       color:notificationColor, // largeIcon:,
       styleInformation: styleInformation,
     );
@@ -209,14 +213,13 @@ class NotificationServices {
     });
   }
 
+   Future init({bool initScheduled=false}) async{
+
+   }
+
   void handleMessage(BuildContext context, RemoteMessage message) {
     if (message.data["type"] == 'msj') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MessageScreen(id: message.data['id']),
-        ),
-      );
+      Navigator.of(context).pushNamed(message.data['screen']);
     }
   }
 
