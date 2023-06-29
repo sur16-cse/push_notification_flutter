@@ -218,9 +218,8 @@ class NotificationServices {
    }
 
   void handleMessage(BuildContext context, RemoteMessage message) {
-    if (message.data["type"] == 'msj') {
+      print(message.data['screen']);
       Navigator.of(context).pushNamed(message.data['screen']);
-    }
   }
 
   void getData(String? icon, String? title, String? message, String body) {
