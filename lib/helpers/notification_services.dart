@@ -46,7 +46,7 @@ class NotificationServices {
    final onNotifications=BehaviorSubject<String?>();
   //initialising local notification
   Future<void> initLocalNotification(
-      BuildContext context, RemoteMessage message) async {
+      BuildContext context,GlobalKey<NavigatorState> navigatorKey, RemoteMessage message) async {
     //helps to change the notification status icon
     var androidInitializationSettings =
         const AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -58,14 +58,14 @@ class NotificationServices {
     await _flutterLocalNotificationsPlugin.initialize(initializationSetting,
         onDidReceiveNotificationResponse: (payload) async{
       // handle interaction when app is active for android
-      handleMessage(context, message);
+      handleMessage(context,navigatorKey, message);
     },
 
     );
   }
 
 //handle incoming message when app is in foreground
-  void firebaseInit(BuildContext context) {
+  void firebaseInit(BuildContext context, GlobalKey<NavigatorState> navigatorKey) {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       if (kDebugMode) {
         print(
@@ -74,7 +74,7 @@ class NotificationServices {
         print(message.data["type"]);
         print(message.data["id"]);
       }
-      initLocalNotification(context, message);
+      initLocalNotification(context,navigatorKey, message);
       showNotification(message);
       // Handle the received message
     });
@@ -199,18 +199,18 @@ class NotificationServices {
   }
 
   //handle deep linking when app terminated or in background
-  Future<void> setupInteractMessage(BuildContext context) async {
+  Future<void> setupInteractMessage(BuildContext context,GlobalKey<NavigatorState> navigatorKey) async {
     //when app is terminated
     RemoteMessage? initialMessage =
         await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null && context.mounted) {
 
-      handleMessage(context, initialMessage);
+      handleMessage(context,navigatorKey, initialMessage);
     }
 
     //when app is in background
     FirebaseMessaging.onMessageOpenedApp.listen((event) {
-      handleMessage(context, event);
+      handleMessage(context,navigatorKey, event);
     });
   }
 
@@ -218,9 +218,9 @@ class NotificationServices {
 
    }
 
-  void handleMessage(BuildContext context, RemoteMessage message) {
+  void handleMessage(BuildContext context,GlobalKey<NavigatorState> navigatorKey, RemoteMessage message) {
       print(message.data['screen']);
-      Navigator.pushNamed(context,message.data['screen']);
+      navigatorKey.currentState?.pushNamed(message.data['screen']);
   }
 
   void getData(String? icon, String? title, String? message, String body) {
