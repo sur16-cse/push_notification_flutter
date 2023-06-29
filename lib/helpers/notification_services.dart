@@ -204,6 +204,7 @@ class NotificationServices {
     RemoteMessage? initialMessage =
         await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null && context.mounted) {
+
       handleMessage(context, initialMessage);
     }
 
@@ -219,7 +220,7 @@ class NotificationServices {
 
   void handleMessage(BuildContext context, RemoteMessage message) {
       print(message.data['screen']);
-      Navigator.of(context).pushNamed(message.data['screen']);
+      Navigator.pushNamed(context,message.data['screen']);
   }
 
   void getData(String? icon, String? title, String? message, String body) {
