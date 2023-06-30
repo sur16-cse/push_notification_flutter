@@ -8,7 +8,8 @@ import 'package:push_notification_firebase/message_screen.dart';
 import 'helpers/notification_services.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  final GlobalKey<NavigatorState> navigatorKey;
+  const HomeScreen({Key? key, required this.navigatorKey}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -23,8 +24,9 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     notificationServices.requestNotificationPermissions();
     notificationServices.getData('ic_stat_notifications_active', "Test_push_notification", "Test push notification", "package push_notification_firebase");
-    notificationServices.firebaseInit(context);
-    notificationServices.setupInteractMessage(context);
+    notificationServices.firebaseInit(context, widget.navigatorKey);
+
+    notificationServices.setupInteractMessage(context,widget.navigatorKey);
     notificationServices.isTokenRefresh();
     notificationServices.getDeviceToken().then((value) {
       if (kDebugMode) {

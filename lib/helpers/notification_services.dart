@@ -7,9 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
 import 'package:push_notification_firebase/utils/download_file.dart';
-import 'package:rxdart/rxdart.dart';
-
-import '../message_screen.dart';
 
 //notification handle in background
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage? message) async {
@@ -43,10 +40,9 @@ class NotificationServices {
   //instantiate a local notification
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
-   final onNotifications=BehaviorSubject<String?>();
   //initialising local notification
-  Future<void> initLocalNotification(
-      BuildContext context,GlobalKey<NavigatorState> navigatorKey, RemoteMessage message) async {
+  Future<void> initLocalNotification(BuildContext context,
+      GlobalKey<NavigatorState> navigatorKey, RemoteMessage message) async {
     //helps to change the notification status icon
     var androidInitializationSettings =
         const AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -55,17 +51,18 @@ class NotificationServices {
     var initializationSetting = InitializationSettings(
         android: androidInitializationSettings, iOS: iosInitializationSettings);
 
-    await _flutterLocalNotificationsPlugin.initialize(initializationSetting,
-        onDidReceiveNotificationResponse: (payload) async{
-      // handle interaction when app is active for android
-      handleMessage(context,navigatorKey, message);
-    },
-
+    await _flutterLocalNotificationsPlugin.initialize(
+      initializationSetting,
+      onDidReceiveNotificationResponse: (payload) async {
+        // handle interaction when app is active for android
+        handleMessage(context, navigatorKey, message);
+      },
     );
   }
 
 //handle incoming message when app is in foreground
-  void firebaseInit(BuildContext context, GlobalKey<NavigatorState> navigatorKey) {
+  void firebaseInit(
+      BuildContext context, GlobalKey<NavigatorState> navigatorKey) {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       if (kDebugMode) {
         print(
@@ -74,7 +71,7 @@ class NotificationServices {
         print(message.data["type"]);
         print(message.data["id"]);
       }
-      initLocalNotification(context,navigatorKey, message);
+      initLocalNotification(context, navigatorKey, message);
       showNotification(message);
       // Handle the received message
     });
@@ -87,21 +84,31 @@ class NotificationServices {
 
   Future<void> showNotification(RemoteMessage message) async {
     String? imageUrl = message.data['imageUrl'];
-    String? largeIcon=message.data['largeIcon'];
+    String? largeIcon = message.data['largeIcon'];
     final bigPicturePath =
         await DownloadFile.downloadFile(imageUrl!, 'imageNotification');
-    final largeIconPath=await DownloadFile.downloadFile(largeIcon!, 'largeIconNotification');
+    final largeIconPath =
+        await DownloadFile.downloadFile(largeIcon!, 'largeIconNotification');
+
     // Create a style information object based on the image URL
     BigPictureStyleInformation? styleInformation;
-    if (imageUrl != null || largeIcon!=null) {
-      styleInformation =
-          BigPictureStyleInformation(FilePathAndroidBitmap(bigPicturePath),largeIcon: FilePathAndroidBitmap(largeIconPath));
+    if (imageUrl != null || largeIcon != null) {
+      styleInformation = BigPictureStyleInformation(
+        contentTitle: 'overridden <b>big</b> content title',
+        htmlFormatContentTitle: true,
+        summaryText: 'summary <i>text</i>',
+        htmlFormatSummaryText: true,
+        FilePathAndroidBitmap(bigPicturePath),
+        hideExpandedLargeIcon: true,
+      );
     } else {
       styleInformation = null;
-
     }
 
-    final Color notificationColor=Color(int.parse(message.data['color'].substring(1, 7), radix: 16) + 0xFF000000);
+
+    final Color notificationColor = Color(
+        int.parse(message.data['color'].substring(1, 7), radix: 16) +
+            0xFF000000);
 
     AndroidNotificationChannel channel = AndroidNotificationChannel(
       Random.secure().nextInt(1000).toString(),
@@ -124,10 +131,11 @@ class NotificationServices {
       importance: Importance.high,
       priority: Priority.high,
       ticker: "ticker",
-      // sound: ,
-
-      color:notificationColor, // largeIcon:,
+      color: notificationColor,
       styleInformation: styleInformation,
+      largeIcon: FilePathAndroidBitmap(largeIconPath),
+      enableVibration: true,
+
     );
 
     const DarwinNotificationDetails darwinNotificationDetails =
@@ -148,7 +156,7 @@ class NotificationServices {
         message.notification?.title.toString(),
         message.notification?.body.toString(),
         notificationDetails,
-        // payload:
+        payload: message.data['screen'],
       );
     });
   }
@@ -199,28 +207,25 @@ class NotificationServices {
   }
 
   //handle deep linking when app terminated or in background
-  Future<void> setupInteractMessage(BuildContext context,GlobalKey<NavigatorState> navigatorKey) async {
+  Future<void> setupInteractMessage(
+      BuildContext context, GlobalKey<NavigatorState> navigatorKey) async {
     //when app is terminated
     RemoteMessage? initialMessage =
         await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null && context.mounted) {
-
-      handleMessage(context,navigatorKey, initialMessage);
+      handleMessage(context, navigatorKey, initialMessage);
     }
 
     //when app is in background
     FirebaseMessaging.onMessageOpenedApp.listen((event) {
-      handleMessage(context,navigatorKey, event);
+      handleMessage(context, navigatorKey, event);
     });
   }
 
-   Future init({bool initScheduled=false}) async{
-
-   }
-
-  void handleMessage(BuildContext context,GlobalKey<NavigatorState> navigatorKey, RemoteMessage message) {
-      print(message.data['screen']);
-      navigatorKey.currentState?.pushNamed(message.data['screen']);
+  void handleMessage(BuildContext context,
+      GlobalKey<NavigatorState> navigatorKey, RemoteMessage message) {
+    print(message.data['screen']);
+    navigatorKey.currentState?.pushNamed(message.data['screen']);
   }
 
   void getData(String? icon, String? title, String? message, String body) {
