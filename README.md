@@ -1,4 +1,6 @@
 # push_notification
+- deep linking
+- different template support (add image, add body, add icons)
 
 A new Flutter project.
 
