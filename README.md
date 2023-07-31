@@ -1,6 +1,4 @@
 # push_notification
-- deep linking
-- different template support (add image, add body, add icons)
 
 A new Flutter project.
 
@@ -78,11 +76,11 @@ android:value="high_importance_channel" />
 - tokenRefesh if expire
 - foreground notification
 - background notification
-- Interact with notification after click switch to some page
+- Interact with notification after click switch to some page i.e, deep linking
 - subscribe notification related to particular topic
 - unsubscribe from topic
 - customising banner of push notification
-
+- different template support (add image, add body, add icons)
 
 ## Getting Started
 
